@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <item name="android_instance_state_counter" type="id"/>
+  <item name="nested_android_instance_state_counter" type="id"/>
+  <item name="nested_android_state_registry_counter" type="id"/>
+  <item name="compose_view" type="id"/>
+</resources>
