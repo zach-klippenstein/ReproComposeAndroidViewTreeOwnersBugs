@@ -60,6 +60,8 @@ The following issues are demonstrated by this project:
  4. There are two sources of truth for saved state in compose: `AmbientUiSavedStateRegistry` and
     `AmbientSavedStateRegistry`. This contributes to 1.1 above, and also makes the
     "Compose Registry" case possible.
+      - This isn't really a _bug_ per say, it's a code smell that seems likely to cause bugs as
+        demonstrated here.
       - Proposed fix: Since both `UiSavedStateRegistry` and `SavedStateRegistry` have essentially
         the same API shape, and `ComposeView` already wraps the incoming `SavedStateRegistry` as a
         `UiSavedStateRegistry`, it seems to me like `AmbientSavedStateRegistry` should simply not
