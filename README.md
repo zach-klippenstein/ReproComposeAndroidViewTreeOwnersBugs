@@ -3,6 +3,8 @@
 This repository contains an Android Compose project that demonstrates a number of issues in the
 Compose <-> Android View integration as of Compose 1.0.0-alpha11.
 
+I have filed a single issue to the Google issue tracker for all this stuff: https://issuetracker.google.com/issues/179708470
+
 ## Components
 
 This project reproduces a number of integration scenarios and has UI tests for all of them.
