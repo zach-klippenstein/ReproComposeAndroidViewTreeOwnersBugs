@@ -30,11 +30,15 @@ The individual components are:
 
 ## Restoration scenarios
 
-There are two cases that are tested using this project:
+There are two type of action that are tested using this project:
 
  - Entire activity is destroyed and recreated, e.g. for a config change.
  - Simple navigation container (`FakeNavigationContainer`) written in Compose simulates navigating
    away from and then back to a screen containing all of the components listed above except the control. This container uses `RestorableStateProvider` to save its childrens' states, and also provides a separate `Lifecycle` for its content each time a fake "navigation" event is triggered using `AmbientLifecycleOwner`.
+
+This project also demonstrates the issue both with Jetpack Navigation and a custom navigation
+host. The custom host is much simpler than Jetpack Nav and is a bit easier to see what's going on
+and play with it.
 
 # Run the UI tests
 
@@ -72,7 +76,7 @@ The following issues are demonstrated by this project:
 
 # Impact
 
-These issues will [likely affect](https://android-review.googlesource.com/c/platform/frameworks/support/+/1577946)
-the Jetpack Navigation library (which sets the `SavedStateRegistry` ambient), as well as any other
+These issues [affect](https://android-review.googlesource.com/c/platform/frameworks/support/+/1577946)
+the Jetpack Navigation library (which sets the `SavedStateRegistry` local), as well as any other
 navigation libraries that are written in Compose, and try to do the right thing by providing
 appropriate lifecycle and saved state registries via the Compose ambients.

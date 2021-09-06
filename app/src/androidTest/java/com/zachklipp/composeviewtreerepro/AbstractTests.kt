@@ -1,11 +1,12 @@
 package com.zachklipp.composeviewtreerepro
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -18,22 +19,17 @@ import androidx.test.espresso.matcher.ViewMatchers.withParent
 import androidx.test.espresso.matcher.ViewMatchers.withSubstring
 import androidx.test.espresso.matcher.ViewMatchers.withTagValue
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.ANDROID_INSTANCE
-import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.COMPOSE_SAVED_REGISTRY
-import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.COMPOSE_SAVEABLE_REGISTRY
-import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.NESTED_ANDROID_INSTANCE
-import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.NESTED_ANDROID_REGISTRY
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.equalTo
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
-class ReproTests {
+abstract class AbstractTests<A : ComponentActivity> {
 
-  @Rule @JvmField val composeRule = createAndroidComposeRule<FakeNavigationActivity>()
+  @get:Rule abstract val composeRule: AndroidComposeTestRule<ActivityScenarioRule<A>, A>
 
   // region Config Changes
 
@@ -239,6 +235,9 @@ class ReproTests {
   private fun resetCounters() {
     composeRule.onNodeWithText("Reset Counters")
       .performClick()
+
+    composeRule.onNodeWithText("Resetting counters…")
+      .assertDoesNotExist()
   }
 
   private fun assertAndroidCounter(name: String, value: Int) {
