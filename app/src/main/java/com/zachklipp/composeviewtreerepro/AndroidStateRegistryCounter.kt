@@ -14,9 +14,6 @@ import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 
 private const val BUNDLE_STATE_KEY = "state"
 
-/**
- * TODO write documentation
- */
 @SuppressLint("SetTextI18n")
 class AndroidStateRegistryCounter(context: Context) : LinearLayout(context) {
 

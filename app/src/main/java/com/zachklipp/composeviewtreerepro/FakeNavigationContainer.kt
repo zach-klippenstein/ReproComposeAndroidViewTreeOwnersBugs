@@ -1,20 +1,19 @@
 package com.zachklipp.composeviewtreerepro
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.Providers
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
-import androidx.compose.runtime.savedinstancestate.ExperimentalRestorableStateHolder
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
+import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
+import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.AmbientLifecycleOwner
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.Event
 import androidx.lifecycle.Lifecycle.State.DESTROYED
@@ -29,11 +28,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  *
  * The content is composed directly, but allows the caller to force the content be skipped and then
  * re-composed from scratch. The content is provided a
- * [AmbientUiSavedStateRegistry] and a [AmbientLifecycleOwner].
+ * [LocalSaveableStateRegistry] and a [LocalLifecycleOwner].
  * The state registry can be used by the child to retain state, and the lifecycle will be destroyed
  * and re-created when the content is reset.
  */
-@OptIn(ExperimentalRestorableStateHolder::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 @Stable
 class FakeNavigationContainer private constructor(
   private var restoredValues: Map<String, List<Any?>>?,
@@ -43,12 +42,12 @@ class FakeNavigationContainer private constructor(
   private var resetting by mutableStateOf(false)
   private var contentLifecycle = ContentLifecycleOwner()
 
-  private var stateRegistry: UiSavedStateRegistry =
-    UiSavedStateRegistry(restoredValues, canBeSaved = canBeSaved)
+  private var stateRegistry: SaveableStateRegistry =
+    SaveableStateRegistry(restoredValues, canBeSaved = canBeSaved)
 
   @Composable fun Content(content: @Composable () -> Unit) {
     if (!resetting) {
-      val parentLifecycle = AmbientLifecycleOwner.current.lifecycle
+      val parentLifecycle = LocalLifecycleOwner.current.lifecycle
       DisposableEffect(parentLifecycle) {
         parentLifecycle.addObserver(contentLifecycle)
         onDispose {
@@ -57,9 +56,9 @@ class FakeNavigationContainer private constructor(
       }
 
       // Can't use Unit because it's not Bundleable.
-      Providers(
-        AmbientLifecycleOwner provides contentLifecycle,
-        AmbientUiSavedStateRegistry provides stateRegistry,
+      CompositionLocalProvider(
+        LocalLifecycleOwner provides contentLifecycle,
+        LocalSaveableStateRegistry provides stateRegistry,
         content = content
       ) /*{
         // // TODO do this manually to demonstrate more issues
@@ -78,7 +77,7 @@ class FakeNavigationContainer private constructor(
         contentLifecycle.destroy()
         contentLifecycle = ContentLifecycleOwner()
 
-        stateRegistry = UiSavedStateRegistry(restoredValues, canBeSaved = canBeSaved)
+        stateRegistry = SaveableStateRegistry(restoredValues, canBeSaved = canBeSaved)
 
         // Trigger another composition pass to compose the content again.
         resetting = false
@@ -118,10 +117,10 @@ class FakeNavigationContainer private constructor(
   companion object {
     @OptIn(ExperimentalComposeApi::class)
     @Composable fun remember(): FakeNavigationContainer {
-      // Can't use RestorableStateHolder because we need to be able to ask for its saved values and
+      // Can't use SaveableStateRegistry because we need to be able to ask for its saved values and
       // recreate manually.
-      val parentRegistry = AmbientUiSavedStateRegistry.current
-      val parentKey = currentComposer.currentCompoundKeyHash.toString()
+      val parentRegistry = LocalSaveableStateRegistry.current
+      val parentKey = currentCompositeKeyHash.toString()
       val container = remember {
         @Suppress("UNCHECKED_CAST")
         val restoredValues = parentRegistry?.consumeRestored(parentKey) as Map<String, List<Any?>>?
@@ -132,9 +131,9 @@ class FakeNavigationContainer private constructor(
       if (parentRegistry != null) {
         DisposableEffect(Unit) {
           val valueProvider = { container.save() }
-          parentRegistry.registerProvider(parentKey, valueProvider)
+          val entry = parentRegistry.registerProvider(parentKey, valueProvider)
           onDispose {
-            parentRegistry.unregisterProvider(parentKey, valueProvider)
+            entry.unregister()
           }
         }
       }

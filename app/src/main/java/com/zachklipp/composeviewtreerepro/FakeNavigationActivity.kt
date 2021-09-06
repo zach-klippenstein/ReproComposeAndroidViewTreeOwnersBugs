@@ -23,12 +23,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.zachklipp.composeviewtreerepro.MainActivity.Companion.COMPOSE_REGISTRY
-import com.zachklipp.composeviewtreerepro.MainActivity.Companion.COMPOSE_UI_REGISTRY
-import com.zachklipp.composeviewtreerepro.MainActivity.Companion.NESTED_ANDROID_INSTANCE
-import com.zachklipp.composeviewtreerepro.MainActivity.Companion.NESTED_ANDROID_REGISTRY
+import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.COMPOSE_SAVED_REGISTRY
+import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.COMPOSE_SAVEABLE_REGISTRY
+import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.NESTED_ANDROID_INSTANCE
+import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.NESTED_ANDROID_REGISTRY
 
-class MainActivity : AppCompatActivity() {
+class FakeNavigationActivity : AppCompatActivity() {
 
   private lateinit var lifecycleSpy: LifecycleSpy
 
@@ -62,8 +62,8 @@ class MainActivity : AppCompatActivity() {
     const val ANDROID_INSTANCE = "Android Instance"
     const val NESTED_ANDROID_INSTANCE = "Nested Android Instance"
     const val NESTED_ANDROID_REGISTRY = "Nested Android Registry"
-    const val COMPOSE_UI_REGISTRY = "Compose UI Registry"
-    const val COMPOSE_REGISTRY = "Compose Registry"
+    const val COMPOSE_SAVEABLE_REGISTRY = "Compose Saveable Registry"
+    const val COMPOSE_SAVED_REGISTRY = "Compose Saved Registry"
   }
 }
 
@@ -90,8 +90,8 @@ fun App(lifecycleSpy: LifecycleSpy) {
 ) {
   fakeNav.Content {
     Column {
-      UiStateRegistryCounter(COMPOSE_UI_REGISTRY, lifecycleSpy)
-      StateRegistryCounter(COMPOSE_REGISTRY, lifecycleSpy)
+      SaveableStateRegistryCounter(COMPOSE_SAVEABLE_REGISTRY, lifecycleSpy)
+      StateRegistryCounter(COMPOSE_SAVED_REGISTRY, lifecycleSpy)
       AndroidView({
         AndroidInstanceStateCounter(it).apply {
           id = R.id.nested_android_instance_state_counter

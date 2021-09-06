@@ -11,9 +11,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.ViewTreeLifecycleOwner
 
-/**
- * TODO write documentation
- */
 @SuppressLint("SetTextI18n")
 class AndroidInstanceStateCounter(context: Context) : LinearLayout(context) {
 

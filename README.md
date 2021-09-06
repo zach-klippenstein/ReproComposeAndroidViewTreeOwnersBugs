@@ -23,9 +23,9 @@ The individual components are:
    `onSaveInstanceState`/`onRestoreInstanceState`.
  - **Nested Android Registry**: Android `View` nested inside a `ComposeView`, using
    `ViewTreeSavedStateRegistryOwner` to save/restore its counter.
- - **Compose UI Registry**: A Composable using the standard Compose idioms for saving state,
-   `saveInstanceState()` (uses `UiSavedStateRegistry` under the hood).
- - **Compose Registry**: A Composable using the `AmbientSavedStateRegistry` to get the nearest
+ - **Compose Saveable Registry**: A Composable using the standard Compose idioms for saving state,
+   `rememberSaveable()` (uses `SaveableStateRegistry` under the hood).
+ - **Compose Saved Registry**: A Composable using the `LocalSavedStateRegistry` to get the nearest
    non-Compose `SavedStateRegistry`.
 
 ## Restoration scenarios
@@ -48,27 +48,27 @@ The following issues are demonstrated by this project:
  1. Android `onRestoreInstanceState` for Android views nested in ComposeViews is very broken, even
     when all known views have their IDs set:
     1. It's not called after config changes.
-    2. It's not called when restoring a composition from a `UiSavedStateRegistry`.
+    2. It's not called when restoring a composition from a `SaveableStateRegistry`.
  2. Nested Android views don't see a custom state registry passed through the
-    `AmbientUiSavedStateRegistry`. They instead see the `SavedStateRegistry` of the composition's
+    `LocalSaveableStateRegistry`. They instead see the `SavedStateRegistry` of the composition's
     `ComposeView`.
-      - Proposed fix: `AndroidView` should read `AmbientUiSavedStateRegistry`, wrap it in a
+      - Proposed fix: `AndroidView` should read `LocalSaveableStateRegistry`, wrap it in a
         `SavedStateRegistry`, and set it as the `ViewTreeSavedStateRegistryOwner` on the nested
         view.
- 3. The `Lifecycle` provided by the `AmbientLifecycleOwner` is never seen by nested Android views.
+ 3. The `Lifecycle` provided by the `LocalLifecycleOwner` is never seen by nested Android views.
     This is demonstrated by the lifecycles from the Android components "leaking" in the repro app.
-      - Proposed fix: `AndroidView` should read the `AmbientLifecycleOwner` and set it as the
+      - Proposed fix: `AndroidView` should read the `LocalLifecycleOwner` and set it as the
         `ViewTreeLifecycleOwner` on the nested view.
- 4. There are two sources of truth for saved state in compose: `AmbientUiSavedStateRegistry` and
-    `AmbientSavedStateRegistry`. This contributes to 1.1 above, and also makes the
+ 4. There are two sources of truth for saved state in compose: `LocalSaveableStateRegistry` and
+    `LocalSavedStateRegistry`. This contributes to 1.1 above, and also makes the
     "Compose Registry" case possible.
       - This isn't really a _bug_ per say, it's a code smell that seems likely to cause bugs as
         demonstrated here.
-      - Proposed fix: Since both `UiSavedStateRegistry` and `SavedStateRegistry` have essentially
+      - Proposed fix: Since both `SaveableStateRegistry` and `SavedStateRegistry` have essentially
         the same API shape, and `ComposeView` already wraps the incoming `SavedStateRegistry` as a
-        `UiSavedStateRegistry`, it seems to me like `AmbientSavedStateRegistry` should simply not
+        `SaveableStateRegistry`, it seems to me like `LocalSavedStateRegistry` should simply not
         exist, and instead, when a `SavedStateRegistry` is required, it should wrap the
-        `UiSavedStateRegistry` from the ambient.
+        `SaveableStateRegistry` from the ambient.
 
 # Impact
 

@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.filterToOne
-import androidx.compose.ui.test.hasSubstring
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onChildren
@@ -20,11 +19,11 @@ import androidx.test.espresso.matcher.ViewMatchers.withSubstring
 import androidx.test.espresso.matcher.ViewMatchers.withTagValue
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.zachklipp.composeviewtreerepro.MainActivity.Companion.ANDROID_INSTANCE
-import com.zachklipp.composeviewtreerepro.MainActivity.Companion.COMPOSE_REGISTRY
-import com.zachklipp.composeviewtreerepro.MainActivity.Companion.COMPOSE_UI_REGISTRY
-import com.zachklipp.composeviewtreerepro.MainActivity.Companion.NESTED_ANDROID_INSTANCE
-import com.zachklipp.composeviewtreerepro.MainActivity.Companion.NESTED_ANDROID_REGISTRY
+import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.ANDROID_INSTANCE
+import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.COMPOSE_SAVED_REGISTRY
+import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.COMPOSE_SAVEABLE_REGISTRY
+import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.NESTED_ANDROID_INSTANCE
+import com.zachklipp.composeviewtreerepro.FakeNavigationActivity.Companion.NESTED_ANDROID_REGISTRY
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.equalTo
 import org.junit.Rule
@@ -34,7 +33,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ReproTests {
 
-  @Rule @JvmField val composeRule = createAndroidComposeRule<MainActivity>()
+  @Rule @JvmField val composeRule = createAndroidComposeRule<FakeNavigationActivity>()
 
   // region Config Changes
 
@@ -68,24 +67,24 @@ class ReproTests {
     assertAndroidCounter(NESTED_ANDROID_REGISTRY, 1)
   }
 
-  @Test fun config_change_state_compose_ui_registry() {
-    assertComposeCounter(COMPOSE_UI_REGISTRY, 0)
-    incComposeCounter(COMPOSE_UI_REGISTRY)
-    assertComposeCounter(COMPOSE_UI_REGISTRY, 1)
+  @Test fun config_change_state_compose_saveable_registry() {
+    assertComposeCounter(COMPOSE_SAVEABLE_REGISTRY, 0)
+    incComposeCounter(COMPOSE_SAVEABLE_REGISTRY)
+    assertComposeCounter(COMPOSE_SAVEABLE_REGISTRY, 1)
 
     simulateConfigChange()
 
-    assertComposeCounter(COMPOSE_UI_REGISTRY, 1)
+    assertComposeCounter(COMPOSE_SAVEABLE_REGISTRY, 1)
   }
 
-  @Test fun config_change_state_compose_registry() {
-    assertComposeCounter(COMPOSE_REGISTRY, 0)
-    incComposeCounter(COMPOSE_REGISTRY)
-    assertComposeCounter(COMPOSE_REGISTRY, 1)
+  @Test fun config_change_state_compose_saved_registry() {
+    assertComposeCounter(COMPOSE_SAVED_REGISTRY, 0)
+    incComposeCounter(COMPOSE_SAVED_REGISTRY)
+    assertComposeCounter(COMPOSE_SAVED_REGISTRY, 1)
 
     simulateConfigChange()
 
-    assertComposeCounter(COMPOSE_REGISTRY, 1)
+    assertComposeCounter(COMPOSE_SAVED_REGISTRY, 1)
   }
 
   @Test fun config_change_lifecycle_android_instance() {
@@ -115,22 +114,22 @@ class ReproTests {
     assertActiveLifecycle(NESTED_ANDROID_REGISTRY, 2).assertCountEquals(1)
   }
 
-  @Test fun config_change_lifecycle_compose_ui_registry() {
-    assertActiveLifecycle(COMPOSE_UI_REGISTRY, 1).assertCountEquals(1)
+  @Test fun config_change_lifecycle_compose_saveable_registry() {
+    assertActiveLifecycle(COMPOSE_SAVEABLE_REGISTRY, 1).assertCountEquals(1)
 
     simulateConfigChange()
 
-    assertActiveLifecycle(COMPOSE_UI_REGISTRY, 1).assertCountEquals(0)
-    assertActiveLifecycle(COMPOSE_UI_REGISTRY, 2).assertCountEquals(1)
+    assertActiveLifecycle(COMPOSE_SAVEABLE_REGISTRY, 1).assertCountEquals(0)
+    assertActiveLifecycle(COMPOSE_SAVEABLE_REGISTRY, 2).assertCountEquals(1)
   }
 
-  @Test fun config_change_lifecycle_compose_registry() {
-    assertActiveLifecycle(COMPOSE_REGISTRY, 1).assertCountEquals(1)
+  @Test fun config_change_lifecycle_compose_saved_registry() {
+    assertActiveLifecycle(COMPOSE_SAVED_REGISTRY, 1).assertCountEquals(1)
 
     simulateConfigChange()
 
-    assertActiveLifecycle(COMPOSE_REGISTRY, 1).assertCountEquals(0)
-    assertActiveLifecycle(COMPOSE_REGISTRY, 2).assertCountEquals(1)
+    assertActiveLifecycle(COMPOSE_SAVED_REGISTRY, 1).assertCountEquals(0)
+    assertActiveLifecycle(COMPOSE_SAVED_REGISTRY, 2).assertCountEquals(1)
   }
 
   // endregion
@@ -166,24 +165,24 @@ class ReproTests {
     assertAndroidCounter(NESTED_ANDROID_REGISTRY, 1)
   }
 
-  @Test fun navigation_state_compose_ui_registry() {
-    assertComposeCounter(COMPOSE_UI_REGISTRY, 0)
-    incComposeCounter(COMPOSE_UI_REGISTRY)
-    assertComposeCounter(COMPOSE_UI_REGISTRY, 1)
+  @Test fun navigation_state_compose_saveable_registry() {
+    assertComposeCounter(COMPOSE_SAVEABLE_REGISTRY, 0)
+    incComposeCounter(COMPOSE_SAVEABLE_REGISTRY)
+    assertComposeCounter(COMPOSE_SAVEABLE_REGISTRY, 1)
 
     resetCounters()
 
-    assertComposeCounter(COMPOSE_UI_REGISTRY, 1)
+    assertComposeCounter(COMPOSE_SAVEABLE_REGISTRY, 1)
   }
 
-  @Test fun navigation_state_compose_registry() {
-    assertComposeCounter(COMPOSE_REGISTRY, 0)
-    incComposeCounter(COMPOSE_REGISTRY)
-    assertComposeCounter(COMPOSE_REGISTRY, 1)
+  @Test fun navigation_state_compose_saved_registry() {
+    assertComposeCounter(COMPOSE_SAVED_REGISTRY, 0)
+    incComposeCounter(COMPOSE_SAVED_REGISTRY)
+    assertComposeCounter(COMPOSE_SAVED_REGISTRY, 1)
 
     resetCounters()
 
-    assertComposeCounter(COMPOSE_REGISTRY, 1)
+    assertComposeCounter(COMPOSE_SAVED_REGISTRY, 1)
   }
 
   @Test fun navigation_lifecycle_android_instance() {
@@ -213,22 +212,22 @@ class ReproTests {
     assertActiveLifecycle(NESTED_ANDROID_REGISTRY, 2).assertCountEquals(1)
   }
 
-  @Test fun navigation_lifecycle_compose_ui_registry() {
-    assertActiveLifecycle(COMPOSE_UI_REGISTRY, 1).assertCountEquals(1)
+  @Test fun navigation_lifecycle_compose_saveable_registry() {
+    assertActiveLifecycle(COMPOSE_SAVEABLE_REGISTRY, 1).assertCountEquals(1)
 
     resetCounters()
 
-    assertActiveLifecycle(COMPOSE_UI_REGISTRY, 1).assertCountEquals(0)
-    assertActiveLifecycle(COMPOSE_UI_REGISTRY, 2).assertCountEquals(1)
+    assertActiveLifecycle(COMPOSE_SAVEABLE_REGISTRY, 1).assertCountEquals(0)
+    assertActiveLifecycle(COMPOSE_SAVEABLE_REGISTRY, 2).assertCountEquals(1)
   }
 
-  @Test fun navigation_lifecycle_compose_registry() {
-    assertActiveLifecycle(COMPOSE_REGISTRY, 1).assertCountEquals(1)
+  @Test fun navigation_lifecycle_compose_saved_registry() {
+    assertActiveLifecycle(COMPOSE_SAVED_REGISTRY, 1).assertCountEquals(1)
 
     resetCounters()
 
-    assertActiveLifecycle(COMPOSE_REGISTRY, 1).assertCountEquals(0)
-    assertActiveLifecycle(COMPOSE_REGISTRY, 2).assertCountEquals(1)
+    assertActiveLifecycle(COMPOSE_SAVED_REGISTRY, 1).assertCountEquals(0)
+    assertActiveLifecycle(COMPOSE_SAVED_REGISTRY, 2).assertCountEquals(1)
   }
 
   // endregion
@@ -254,7 +253,7 @@ class ReproTests {
 
   private fun assertComposeCounter(name: String, value: Int) {
     inComposeCounter(name)
-      .filterToOne(hasSubstring("Counter: $value"))
+      .filterToOne(hasText("Counter: $value", substring = true))
       .assertIsDisplayed()
   }
 
@@ -267,7 +266,7 @@ class ReproTests {
   private fun assertActiveLifecycle(name: String, generation: Int) =
     composeRule.onNodeWithTag("lifecycles")
       .onChildren()
-      .filter(hasSubstring("[$generation] $name"))
+      .filter(hasText("[$generation] $name", substring = true))
 
   private fun inComposeCounter(name: String) =
     composeRule.onNodeWithTag(name)
